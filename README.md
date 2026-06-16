@@ -1,55 +1,109 @@
-# ⏳ Hindsight
+<div align="center">
 
-**The clarity of looking back.** A what-if time machine for crypto: pick a coin, a
-date, and an amount, and Hindsight replays the *real* market — every daily close
-since the coin existed — to tell you, to the dollar, what that bet would be worth
-today.
+# ⏳ HINDSIGHT
 
-🔗 **Live:** https://hindsight-crypto.web.app
+### _The clarity of looking back._
+
+A what-if time machine for crypto. Pick a coin, a date, and an amount — Hindsight replays the **real market**, every daily close since the coin existed, and tells you to the dollar what that bet would be worth today.
+
+<br />
+
+[![Live Demo](https://img.shields.io/badge/live_demo-hindsight--crypto.web.app-E0A526?style=for-the-badge)](https://hindsight-crypto.web.app)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-E0A526.svg)](LICENSE)
+![React](https://img.shields.io/badge/React-18-1b160e?logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-1b160e?logo=typescript&logoColor=3178C6)
+![Vite](https://img.shields.io/badge/Vite-5-1b160e?logo=vite&logoColor=646CFF)
+![Firebase Hosting](https://img.shields.io/badge/Firebase-Hosting-1b160e?logo=firebase&logoColor=FFCA28)
+![No backend](https://img.shields.io/badge/architecture-pure_frontend-6fbf86)
+
+<br />
+
+<img src="docs/hero.png" alt="Hindsight — the console and a sample Bitcoin backtest result" width="860" />
+
+</div>
 
 ---
 
-## What it does
+## Overview
 
-Two strategies, one engine, real historical prices from the [CoinStats Open API](https://coinstats.app/api/):
+Most crypto tools tell you what something costs *now*. Hindsight answers the question people
+actually ask themselves: **"What if I'd bought it back then?"**
 
-- **One-time buy** — _"A single $1,000 of BTC on Mar 13 2020 would be worth $8,990 today — 8.99×."_
-- **Recurring (DCA)** — _"$50 into BTC every week since…"_, with a **vs. lump-sum**
-  comparison so you can see whether dollar-cost-averaging actually beat buying all at once.
+You set the dials — an asset, a strategy, an amount, a date — and the app pulls that coin's full
+daily price history and replays it locally to compute the honest outcome: total value today, ROI,
+the path it took to get there, and the bumps along the way.
 
-Every result comes with:
+It's a **pure frontend** (no server). The browser talks to the [CoinStats Open API](https://openapi.coinstats.app/)
+directly, and the entire simulation runs client-side.
 
-- An animated payoff readout (ROI, multiple).
-- An interactive value chart — cost-basis line, a dot for every buy, and a hover scrubber.
-- Stats: total invested, units held, average cost, max drawdown.
-- Flavor: peak value, deepest drawdown, and the best / worst single days along the way.
-- Coin autocomplete (search any of ~20k coins), a live top-coins ticker, and quick
-  date presets (COVID low, 2021 top, bear bottom, 1 year ago).
+## ✨ Features
 
-## How it works
+- **Two strategies, one engine**
+  - 🎯 **One-time buy** — _"A single $1,000 of BTC on Mar 13 2020 would be worth $8,941 today — 8.94×."_
+  - 🔁 **Recurring (DCA)** — _"$50 into BTC every week since…"_ — complete with a **vs. lump-sum**
+    verdict so you see whether dollar-cost-averaging actually won.
+- **📈 Interactive value chart** — hand-built SVG: a cost-basis line, a dot for every purchase, and a
+  hover scrubber that reads out value and amount-invested on any day.
+- **🔍 Search the whole market** — debounced autocomplete over ~20,000 coins.
+- **🧮 Real numbers** — invested, units held, average cost, max drawdown, peak value, best/worst
+  single days, and the lump-sum alternative.
+- **🕰️ One-tap historical moments** — jump to the COVID low, the 2021 top, the bear-market bottom,
+  or one year ago.
+- **🪙 Live ticker** — top coins streaming across the masthead.
+- **🎨 A look that isn't a template** — warm filmic palette, [Fraunces](https://fonts.google.com/specimen/Fraunces)
+  serif display against monospaced tabular numerals, an engraved grid, and a single brass accent.
 
-It's a **pure frontend** — no backend, no server. The browser calls the CoinStats
-Open API directly (their CORS is open), pulls a coin's full daily history
-(`/coins/{id}/charts?period=all`), and the backtest engine
-([`src/lib/backtest.ts`](src/lib/backtest.ts)) replays it locally:
+## 📸 Screenshots
 
-1. Schedule the buy dates (one, or every day/week/month from the start date).
-2. For each buy, look up the price on that day (binary search over the history) and
-   accumulate coin units.
-3. Walk the timeline to build the value-over-time series, drawdown, and a lump-sum baseline.
+<div align="center">
+<table>
+  <tr>
+    <td align="center"><strong>Desktop</strong></td>
+    <td align="center"><strong>Mobile</strong></td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="docs/hero.png" alt="Desktop view" width="520" /></td>
+    <td valign="top"><img src="docs/mobile.png" alt="Mobile view" width="240" /></td>
+  </tr>
+</table>
+</div>
 
-No live trading and no fees are modeled — just the honest math of the daily closes.
-Long-range history is daily resolution, which faithfully models HODL/DCA strategies
-(but not intraday fills).
+## 🛠️ How it works
 
-## Tech
+```mermaid
+flowchart LR
+    A[Browser] -->|GET /coins, /charts| B[(CoinStats Open API)]
+    B -->|full daily history| A
+    A --> C[backtest engine<br/>src/lib/backtest.ts]
+    C --> D[value series · ROI · drawdown · buys]
+    D --> E[SVG chart + readouts]
+```
 
-- **React + TypeScript + Vite** — static build, no framework backend.
-- Hand-rolled **SVG** chart (no chart library).
-- Design: warm filmic palette, [Fraunces](https://fonts.google.com/specimen/Fraunces)
-  serif display + monospaced tabular numerals, an engraved grid, a single brass accent.
+The simulation in [`src/lib/backtest.ts`](src/lib/backtest.ts):
 
-## Getting started
+1. **Schedule the buys** — one purchase, or one every day / week / month from the start date.
+2. **Price each buy** — binary-search the daily history for the close on that date and accumulate
+   coin units.
+3. **Replay the timeline** — walk forward to build the value-over-time series, track the running
+   cost basis, compute peak value and max drawdown, and calculate a **lump-sum baseline** (the same
+   total invested all at once on day one) for comparison.
+
+No live trading and no fees are modeled — just the arithmetic of real daily closes. Long-range
+history is daily resolution, which faithfully models HODL / DCA strategies (not intraday fills).
+
+## 🧱 Tech stack
+
+| Layer        | Choice                                                            |
+| ------------ | ----------------------------------------------------------------- |
+| UI           | React 18 + TypeScript                                             |
+| Build        | Vite 5                                                            |
+| Charts       | Hand-rolled SVG (no chart library)                                |
+| Data         | [CoinStats Open API](https://openapi.coinstats.app/) (CORS, direct from browser) |
+| Hosting      | Firebase Hosting (static)                                         |
+| Type-styling | Fraunces · Inter · JetBrains Mono                                 |
+
+## 🚀 Getting started
 
 ```bash
 # 1. install
@@ -57,26 +111,34 @@ npm install
 
 # 2. add your CoinStats key
 cp .env.example .env
-#   then edit .env and set VITE_COINSTATS_API_KEY (get a key at https://openapi.coinstats.app/)
+#    edit .env → VITE_COINSTATS_API_KEY=...   (grab a key at https://openapi.coinstats.app/)
 
 # 3. run
-npm run dev        # http://localhost:5173
-
-# build static site
-npm run build      # outputs to dist/
-npm run preview    # preview the production build
+npm run dev        # → http://localhost:5173
 ```
 
-## Deploy (Firebase Hosting)
+### Scripts
 
-The repo is wired to Firebase Hosting (site `hindsight-crypto`):
+| Command           | What it does                              |
+| ----------------- | ----------------------------------------- |
+| `npm run dev`     | Start the Vite dev server                 |
+| `npm run build`   | Build the static site into `dist/`        |
+| `npm run preview` | Serve the production build locally        |
+
+## ☁️ Deployment
+
+Deployed to Firebase Hosting as the site `hindsight-crypto`:
 
 ```bash
 npm run build
 firebase deploy --only hosting:hindsight-crypto
 ```
 
-## Project layout
+> `firebase.json` and `.firebaserc` are git-ignored in this repo. To deploy from a fresh clone,
+> run `firebase init hosting` (public dir `dist`, single-page rewrite to `/index.html`) or recreate
+> those two files.
+
+## 🗂️ Project structure
 
 ```
 src/
@@ -92,12 +154,34 @@ src/
     TickerStrip.tsx       live top-coins ticker
   App.tsx                 the console + result composition
   styles.css              the design system
+docs/                     screenshots used in this README
 ```
 
-## License
+## 🧭 Roadmap
 
-MIT — do whatever you like.
+- [ ] Shareable result cards (downloadable PNG / copy-link)
+- [ ] Per-coin date clamping to each coin's listing date
+- [ ] Compare two coins / strategies side by side
+- [ ] Inflation-adjusted ("real") returns
+- [ ] Optional proxy to hide the API key (Cloud Function / Cloud Run)
+
+## ⚠️ A note on the API key
+
+Because this is a pure-frontend app, the CoinStats API key is **bundled into the shipped JavaScript
+and is publicly visible** — an inherent trade-off of having no backend. Use a key you're willing to
+expose and can rate-limit / rotate from the CoinStats dashboard. To hide it, put a small proxy in
+front of the API and point [`src/api.ts`](src/api.ts) at it instead.
+
+## 📄 License
+
+[MIT](LICENSE) © 2026 Rafael Muradyan
 
 ---
 
-*Past performance is not a promise — it's a lesson.* · Market data by the CoinStats Open API.
+<div align="center">
+
+_Past performance is not a promise — it's a lesson._
+<br />
+Market data by the <a href="https://openapi.coinstats.app/">CoinStats Open API</a>.
+
+</div>
