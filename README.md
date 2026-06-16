@@ -11,7 +11,7 @@ today.
 
 ## What it does
 
-Two strategies, one engine, real historical prices from the [CoinStats Open API](https://openapi.coinstats.app/):
+Two strategies, one engine, real historical prices from the [CoinStats Open API](https://coinstats.app/api/):
 
 - **One-time buy** — _"A single $1,000 of BTC on Mar 13 2020 would be worth $8,990 today — 8.99×."_
 - **Recurring (DCA)** — _"$50 into BTC every week since…"_, with a **vs. lump-sum**
