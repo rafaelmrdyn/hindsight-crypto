@@ -165,12 +165,6 @@ docs/                     screenshots used in this README
 - [ ] Inflation-adjusted ("real") returns
 - [ ] Optional proxy to hide the API key (Cloud Function / Cloud Run)
 
-## ⚠️ A note on the API key
-
-Because this is a pure-frontend app, the CoinStats API key is **bundled into the shipped JavaScript
-and is publicly visible** — an inherent trade-off of having no backend. Use a key you're willing to
-expose and can rate-limit / rotate from the CoinStats dashboard. To hide it, put a small proxy in
-front of the API and point [`src/api.ts`](src/api.ts) at it instead.
 
 ## 📄 License
 
