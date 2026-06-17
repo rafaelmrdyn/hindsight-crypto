@@ -17,7 +17,7 @@ export interface Coin {
 // CoinStats chart points are [unixSeconds, priceUsd, priceBtc, ...].
 export type ChartPoint = [number, number, ...number[]]
 
-const BASE = 'https://openapiv1.coinstats.app'
+const BASE = 'https://api.coinstats.app'
 const KEY = import.meta.env.VITE_COINSTATS_API_KEY as string
 
 async function get<T>(path: string): Promise<T> {
